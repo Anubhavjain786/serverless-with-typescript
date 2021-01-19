@@ -1,32 +1,73 @@
 # NOTE: update this with your service name
 service: serverless-typescript-starter
 
-# Create an optimized package for our functions 
-package:
-  individually: true
-
 plugins:
   - serverless-bundle # Package our functions with Webpack
   - serverless-offline
   - serverless-dotenv-plugin # Load .env as environment variables
 
+custom:
+  bundle:
+    forceInclude:
+      - mysql2
+
 provider:
   name: aws
   runtime: nodejs12.x
   stage: dev
-  region: us-east-1
-  # To load environment variables externally
-  # rename env.example to .env and uncomment
-  # the following line. Also, make sure to not
-  # commit your .env.
-  #
-  #environment:
-  #  SAMPLE_ENV_VAR: ${env:SAMPLE_ENV_VAR}
+  region: ${env:APP_AWS_REGION}
+
+environment:
+  APP_AWS_REGION: ${env:APP_AWS_REGION}
+  JWT_SECRET: ${env:JWT_SECRET}
+  SALT_ROUNDS: ${env:SALT_ROUNDS}
+  DB_CLIENT: ${env:DB_CLIENT}
+  DB_HOST: ${env:DB_HOST}
+  DB_USER: ${env:DB_USER}
+  DB_PASSWORD: ${env:DB_PASSWORD}
+  DB_DATABASE: ${env:DB_DATABASE}
+  DB_PORT: ${env:DB_PORT}
 
 functions:
-  hello:
-    handler: handler.hello
+  auth:
+    handler: handler.responder
     events:
       - http:
-          path: hello
+          path: /auth/login
+          method: post
+      - http:
+          path: /auth/signup
+          method: post
+
+  profile:
+    handler: handler.responder
+    events:
+      - http:
+          path: /profile
+          method: put
+          authorizer: authorizerFunc
+
+  authorizerFunc:
+    handler: handler.auth
+
+  getUser:
+    handler: handler.getUserResponder
+    events:
+      - http:
+          path: /users/{username}
           method: get
+
+  toggleFollowing:
+    handler: handler.toogleFollowingResponder
+    events:
+      - http:
+          path: /users/{username}/toggle-following
+          method: post
+          authorizer: authorizerFunc
+
+  migrate:
+    handler: handler.responder
+    events:
+      - http:
+          path: /migrate
+          method: post

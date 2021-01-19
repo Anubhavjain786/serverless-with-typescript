@@ -4,9 +4,14 @@
   "description": "A TypeScript starter for Serverless Framework",
   "main": "handler.js",
   "scripts": {
-    "test": "serverless-bundle test"
+    "test": "serverless-bundle test",
+    "knex": "knex --knexfile knexfile.ts",
+    "migrate:up": "npm run knex migrate:latest",
+    "migrate:down": "npm run knex migrate:rollback",
+    "migrate:make": "npm run knex migrate:make -- -x ts"
   },
-  "author": "",
+  "author": "Anubhav Jain",
+  "rootDir": ".",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -19,5 +24,14 @@
     "serverless-dotenv-plugin": "^3.0.0",
     "serverless-offline": "^6.8.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.21.15",
+    "mysql2": "^2.2.5",
+    "objection": "^2.2.6",
+    "uuid": "^8.3.2"
+  }
 }
